@@ -1,17 +1,21 @@
-/**
- * Конструктор класса обмена сообщениями
- */
 function PubSub(){
+    this.events = {};
 };
-
 /**
  * Функция подписки на событие
  * @param  String eventName     имя события
  * @param  Function handler     функция которая будет вызвана при возникновении события
  * @return Function             ссылка на handler
  */
+
 PubSub.prototype.subscribe = function(eventName, handler) {
-    // body…
+    var funcs = this.events[eventName];
+    if (!funcs) {
+    funcs = [];   
+    } else {
+    funcs.push(handler); 
+    }
+    return handler;
 };
 
 /**
@@ -21,7 +25,15 @@ PubSub.prototype.subscribe = function(eventName, handler) {
  * @return Function             ссылка на handler
  */
 PubSub.prototype.unsubscribe = function(eventName, handler) {
-    // body…
+    var funcs = this.events[eventName];
+    if (funcs) {
+    funcs.forEach(function(f, i) {
+    if (f === handler) {
+    funcs.splice(i,1); 
+            }
+        });
+    }
+    return handler;
 };
 
 /**
@@ -30,8 +42,17 @@ PubSub.prototype.unsubscribe = function(eventName, handler) {
  * @param  Any data             данные для обработки соответствующими функциями
  * @return Boolean              удачен ли результат операции
  */
+
 PubSub.prototype.publish = function(eventName, data) {
-    // body...
+    var funcs = this.events[eventName];
+    
+    if (funcs) {
+    funcs.forEach(function(f) {
+    f(data);
+    return true;
+        });
+    };                                  
+   return false;                                   
 };
 
 /**
@@ -39,8 +60,12 @@ PubSub.prototype.publish = function(eventName, data) {
  * @param  String eventName     имя события
  * @return Boolean              удачен ли результат операции
  */
+
 PubSub.prototype.off = function(eventName) {
-    // body…
+    var funcs = this.events[eventName];
+    if (funcs) {
+    funcs.length = 0;       
+    }
 };
 
 /*
@@ -64,8 +89,14 @@ PubSub.prototype.off = function(eventName) {
  */
 
 function foo(event, data) {
-    //body…
+  
 }
+
+var globalPubSub = new PubSub();
+Function.prototype.GlobalPubSub = globalPubSub;
+
+Function.prototype.subscribe = globalPubSub.subscribe.bind(globalPubSub);
+Function.prototype.unsubscribe = globalPubSub.unsubscribe.bind(globalPubSub);
 
 foo.subscribe('click');
 
