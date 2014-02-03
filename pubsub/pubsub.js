@@ -12,8 +12,8 @@ PubSub.prototype.subscribe = function(eventName, handler) {
     if (!funcs) {
         funcs = []; 
     } 
-    else {
-        funcs.push(handler); 
+    if (handler !== underfined) {
+        funcs.push(handler);
     }
     return handler;
 };
@@ -25,13 +25,13 @@ PubSub.prototype.subscribe = function(eventName, handler) {
  */
 PubSub.prototype.unsubscribe = function(eventName, handler) {
     var funcs = this.events[eventName];
+        index;
     if (funcs) {
-        funcs.forEach(function(f, i) {
-            if (f === handler) {
-                funcs.splice(i,1); 
+         index = funcs.indexOf(handler); 
+            if (index !== -1) {
+                funcs.splice(index, 1); 
             }
-        });
-    }
+        }
     return handler;
 };
 /**
@@ -44,7 +44,8 @@ PubSub.prototype.publish = function(eventName, data) {
     var funcs = this.events[eventName];
     if (funcs) {
          funcs.forEach(function(f) {
-            setTimeout(f(data),10);
+            //?
+            setTimeout(function() { f(data) }, 10);
             return true;
          });
     };                                  
@@ -87,10 +88,8 @@ function foo(event, data) {
 }
 
 Function.prototype.GlobalPubSub = new PubSub();
-
-Function.prototype.subscribe = globalPubSub.subscribe.bind(globalPubSub);
-Function.prototype.unsubscribe = globalPubSub.unsubscribe.bind(globalPubSub);
+Function.prototype.subscribe = Function.prototype.GlobalPubSub.prototype.subscribe.bind(Function.prototype.GlobalPubSub);
+Function.prototype.unsubscribe = Function.prototype.GlobalPubSub.prototype.unsubscribe.bind(Function.prototype.GlobalPubSub));
 
 foo.subscribe('click');
-
 foo.unsubscribe('click');
