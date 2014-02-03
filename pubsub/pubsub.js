@@ -10,9 +10,10 @@ function PubSub(){
 PubSub.prototype.subscribe = function(eventName, handler) {
     var funcs = this.events[eventName];
     if (!funcs) {
-    funcs = [];   
-    } else {
-    funcs.push(handler); 
+        funcs = []; 
+    } 
+    else {
+        funcs.push(handler); 
     }
     return handler;
 };
@@ -25,9 +26,9 @@ PubSub.prototype.subscribe = function(eventName, handler) {
 PubSub.prototype.unsubscribe = function(eventName, handler) {
     var funcs = this.events[eventName];
     if (funcs) {
-    funcs.forEach(function(f, i) {
-    if (f === handler) {
-    funcs.splice(i,1); 
+        funcs.forEach(function(f, i) {
+            if (f === handler) {
+                funcs.splice(i,1); 
             }
         });
     }
@@ -42,24 +43,14 @@ PubSub.prototype.unsubscribe = function(eventName, handler) {
 PubSub.prototype.publish = function(eventName, data) {
     var funcs = this.events[eventName];
     if (funcs) {
-    funcs.forEach(function(f) {
-    setTimeout(f(data),10);
-    return true;
-        });
+         funcs.forEach(function(f) {
+            setTimeout(f(data),10);
+            return true;
+         });
     };                                  
    return false;                                   
 };
 
-/*PubSub.prototype.publish = function(eventName, data) {
- -    return false;
- +    if (this.events[eventName] === (undefined || this.events[eventName].length === 0)) {
- +        return false;
- +    } else {
- +        this.events[eventName].forEach(function(handler) {
- +            setTimeout(handler(data), 10);
- +        });
- +        return true;
- +    }
 /**
  * Функция отписывающая все функции от определённого события
  * @param  String eventName     имя события
@@ -68,7 +59,7 @@ PubSub.prototype.publish = function(eventName, data) {
 PubSub.prototype.off = function(eventName) {
     var funcs = this.events[eventName];
     if (funcs) {
-    funcs.length = 0;       
+        funcs.length = 0;
     }
 };
 /*
