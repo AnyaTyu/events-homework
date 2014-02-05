@@ -11,9 +11,11 @@ PubSub.prototype.subscribe = function(eventName, handler) {
     var funcs = this.events[eventName];
     if (!funcs) {
         funcs = []; 
-    } 
+    }
     if (handler !== underfined) {
-        funcs.push(handler);
+        if (funcs.indexOf(handler) == -1) {
+            funcs.push(handler);
+        };
     }
     return handler;
 };
@@ -44,7 +46,6 @@ PubSub.prototype.publish = function(eventName, data) {
     var funcs = this.events[eventName];
     if (funcs) {
          funcs.forEach(function(f) {
-            //?
             setTimeout(function() { f(data) }, 10);
             return true;
          });
