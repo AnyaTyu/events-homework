@@ -8,14 +8,9 @@ function PubSub(){
  * @return Function             ссылка на handler
  */
 PubSub.prototype.subscribe = function(eventName, handler) {
-    var funcs = this.events[eventName];
-    if (!funcs) {
-        funcs = []; 
-    }
-    if (handler !== underfined) {
-        if (funcs.indexOf(handler) == -1) {
+    var funcs = this.events[eventName] || [];
+    if (handler && (funcs.indexOf(handler) == -1)) {
             funcs.push(handler);
-        };
     }
     return handler;
 };
@@ -47,8 +42,8 @@ PubSub.prototype.publish = function(eventName, data) {
     if (funcs) {
          funcs.forEach(function(f) {
             setTimeout(function() { f(data) }, 10);
-            return true;
          });
+         return true;
     };                                  
    return false;                                   
 };
@@ -61,7 +56,11 @@ PubSub.prototype.publish = function(eventName, data) {
 PubSub.prototype.off = function(eventName) {
     var funcs = this.events[eventName];
     if (funcs) {
-        funcs.length = 0;
+        funcs = undefined;
+        return true;
+    }
+    else{
+        return false;
     }
 };
 /*
@@ -87,10 +86,12 @@ PubSub.prototype.off = function(eventName) {
 function foo(event, data) {
   
 }
+var funcProto = Function.prototype,
+    psProto = PubSub.prototype,
+    globalPubSub = funcProto.GlobalPubSub = new PubSub();
 
-Function.prototype.GlobalPubSub = new PubSub();
-Function.prototype.subscribe = Function.prototype.GlobalPubSub.prototype.subscribe.bind(Function.prototype.GlobalPubSub);
-Function.prototype.unsubscribe = Function.prototype.GlobalPubSub.prototype.unsubscribe.bind(Function.prototype.GlobalPubSub));
+funcProto.subscribe = psProto.subscribe.bind(globalPubSub);
+funcProto.unsubscribe = psProto.unsubscribe.bind(globalPubSub);
 
 foo.subscribe('click');
 foo.unsubscribe('click');
