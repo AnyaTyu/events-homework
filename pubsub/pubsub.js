@@ -21,7 +21,7 @@ PubSub.prototype.subscribe = function(eventName, handler) {
  * @return Function             ссылка на handler
  */
 PubSub.prototype.unsubscribe = function(eventName, handler) {
-    var funcs = this.events[eventName];
+    var funcs = this.events[eventName],
         index;
     if (funcs) {
          index = funcs.indexOf(handler); 
@@ -40,11 +40,10 @@ PubSub.prototype.unsubscribe = function(eventName, handler) {
 PubSub.prototype.publish = function(eventName, data) {
     var funcs = this.events[eventName];
     if (funcs) {
-         funcs.forEach(function(f) {
-            setTimeout(function() { f(data) }, 10);
+         funcs.forEach(function() {
+            setTimeout(function() { f(data, eventName) }, 0);
          });
-         return true;
-    };                                  
+    }                                  
    return false;                                   
 };
 
@@ -56,12 +55,10 @@ PubSub.prototype.publish = function(eventName, data) {
 PubSub.prototype.off = function(eventName) {
     var funcs = this.events[eventName];
     if (funcs) {
-        funcs = undefined;
+        this.events[eventName] = undefined;
         return true;
     }
-    else{
-        return false;
-    }
+    return false;
 };
 /*
     Примеры использования
@@ -86,12 +83,10 @@ PubSub.prototype.off = function(eventName) {
 function foo(event, data) {
   
 }
-var funcProto = Function.prototype,
-    psProto = PubSub.prototype,
-    globalPubSub = funcProto.GlobalPubSub = new PubSub();
+Function.prototype.GlobalPubSub = new PubSub();
 
-funcProto.subscribe = psProto.subscribe.bind(globalPubSub);
-funcProto.unsubscribe = psProto.unsubscribe.bind(globalPubSub);
+Function.prototype.subscribe = Function.prototype.GlobalPubSub.subscribe;
+Function.prototype.unsubscribe = Function.prototype.GlobalPubSub.unsubscribe;
 
 foo.subscribe('click');
 foo.unsubscribe('click');
