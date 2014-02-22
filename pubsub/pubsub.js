@@ -8,7 +8,8 @@ function PubSub(){
  * @return Function             ссылка на handler
  */
 PubSub.prototype.subscribe = function(eventName, handler) {
-    var funcs = this.events[eventName] || [];
+    this.events[eventName] = this.events[eventName] || [];
+    var funcs = this.events[eventName];
     if (handler && (funcs.indexOf(handler) == -1)) {
             funcs.push(handler);
     }
@@ -85,8 +86,12 @@ function foo(event, data) {
 }
 Function.prototype.GlobalPubSub = new PubSub();
 
-Function.prototype.subscribe = Function.prototype.GlobalPubSub.subscribe;
-Function.prototype.unsubscribe = Function.prototype.GlobalPubSub.unsubscribe;
+Function.prototype.subscribe = function() {
+     this.subscribe.apply(Function.prototype.GlobalPubSub, arguments);
+}
+Function.prototype.unsubscribe = function() {
+    this.unsubscribe.apply(Function.prototype.GlobalPubSub, arguments);
+}
 
 foo.subscribe('click');
 foo.unsubscribe('click');
