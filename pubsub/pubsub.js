@@ -8,8 +8,7 @@ function PubSub(){
  * @return Function             ссылка на handler
  */
 PubSub.prototype.subscribe = function(eventName, handler) {
-    this.events[eventName] = this.events[eventName] || [];
-    var funcs = this.events[eventName];
+    var funcs = this.events[eventName] = this.events[eventName] || [];
     if (handler && (funcs.indexOf(handler) == -1)) {
             funcs.push(handler);
     }
@@ -44,6 +43,7 @@ PubSub.prototype.publish = function(eventName, data) {
          funcs.forEach(function() {
             setTimeout(function() { f(data, eventName) }, 0);
          });
+        return true;
     }                                  
    return false;                                   
 };
@@ -87,10 +87,11 @@ function foo(event, data) {
 Function.prototype.GlobalPubSub = new PubSub();
 
 Function.prototype.subscribe = function() {
-     this.subscribe.apply(Function.prototype.GlobalPubSub, arguments);
+     this.GlobalPubSub.subscribe(arguments);
 }
+
 Function.prototype.unsubscribe = function() {
-    this.unsubscribe.apply(Function.prototype.GlobalPubSub, arguments);
+    this.GlobalPubSub.unsubscribe(arguments);
 }
 
 foo.subscribe('click');
